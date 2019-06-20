@@ -1,4 +1,4 @@
-module App.Animation
+module Animation
 
 open System
 open Fable.Core

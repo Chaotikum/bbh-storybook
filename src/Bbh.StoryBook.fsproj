@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Story.fs" />
     <Compile Include="Animation.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
