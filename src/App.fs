@@ -8,68 +8,59 @@ open Fulma
 open Fable.FontAwesome
 
 open Story
-open Animation
+open Fable.ReactSimpleAnimate
 
 
 type Story =
     { History: string list
       Next: Next }
 
-type Choices =
-    { Tony: Question 
-      Thomas: Question }
+type Person =
+    | Tony
+    | Thomas
+
+type Choices = (Person * Question) list
 
 type Model =
     | StoryPage of Story
     | Start of Choices
 
-type Person =
-    | Tony
-    | Thomas
+type AnswerSide =
+    | Left
+    | Right
 
 type Msg =
-    | Choose of Person
-    | AnswerLeft
-    | AnswerRight
+    | Choose of Question
+    | Answer of AnswerSide
     | Restart
 
 let init () =
-    // todo: remove from state, it's static
-    let start =
-        { Tony = Story.tony
-          Thomas = Story.thomas }
-        |> Start
+    Start [ Tony, Story.tony; Thomas, Story.thomas ]
+    , Cmd.none
 
-    start, Cmd.none
-
-let choose model question =
+let choose question =
     let newModel =
         { History = []
           Next = NextQuestion question }
-        |> StoryPage 
+        |> StoryPage
     newModel, Cmd.none
-
-let answer history question answer =
-    { History =
-        history
-        @ [ question.Text
-            answer.Title
-            answer.ResultText ]
-      Next = answer.Next }
-    |> StoryPage
-    , Cmd.none
 
 let update msg model =
     match msg, model with
-    | Choose Tony, Start choices ->
-        choose model choices.Tony
-    | Choose Thomas, Start choices ->
-        choose model choices.Thomas
+    | Choose question, Start _ ->
+        choose question
 
-    | AnswerLeft, StoryPage { History = history; Next = NextQuestion question } ->
-        answer history question question.LeftAnswer
-    | AnswerRight, StoryPage { History = history; Next = NextQuestion question } ->
-        answer history question question.RightAnswer
+    | Answer side, StoryPage { History = history; Next = NextQuestion question } ->
+        let answer =
+            match side with | Left -> question.LeftAnswer | Right -> question.RightAnswer
+        { History =
+            history
+            @ [ question.Text
+                // answer.Title
+                answer.ResultText ]
+          Next = answer.Next }
+        |> StoryPage
+        , Cmd.none
 
     | Restart, _ -> init()
 
@@ -83,34 +74,39 @@ let button msg title dispatch =
           [ str title ]
 
 let startView choices dispatch =
-    div []
-        [ button (Choose Tony) "Tony" dispatch
-          button (Choose Thomas) "Thomas" dispatch ]
+    choices
+    |> List.map (fun (person, question) ->
+        button (Choose question) (string person) dispatch)
+    |> div []
+
+let fadeIn text =
+    Animate.animate
+        [ Animate.Play true
+          Animate.Start [ Opacity 0. ]
+          Animate.End [ Opacity 1. ]
+          Animate.Duration (TimeSpan.FromSeconds 1.)
+          Animate.Key text ]
+        [ p [] [ str text ] ]
 
 let questionView question dispatch =
-    Animate.animate
-        [ Animate.Prop.Play true
-          Animate.Prop.Start [ Opacity 0. ]
-          Animate.Prop.End [ Opacity 1. ]
-          Animate.Prop.Duration (TimeSpan.FromSeconds 1.) ]
-        [ div []
-            [ p [] [ str question.Text ]
-              button AnswerLeft question.LeftAnswer.Title dispatch
-              button AnswerRight question.RightAnswer.Title dispatch ] ]
+    [ fadeIn question.Text
+      button (Answer Left) question.LeftAnswer.Title dispatch
+      button (Answer Right) question.RightAnswer.Title dispatch ]
+   |> div []
 
 let storyView story dispatch =
     let history =
         story.History
         |> List.map (fun h -> p [] [ str h ])
-        |> div []
+        |> div [ Class "history" ]
     let next =
         match story.Next with
-        | End -> p [] [str "The End <3"]
+        | End -> p [] [ str "Ende" ]
         | NextQuestion question -> questionView question dispatch
     div []
         [ history
           next
-          button Restart "restart" dispatch ]
+          button Restart "Nochmal" dispatch ]
 
 let view model dispatch =
     match model with
@@ -128,7 +124,3 @@ Program.mkProgram init update view
 |> Program.withDebugger
 #endif
 |> Program.run
-
-
-
-

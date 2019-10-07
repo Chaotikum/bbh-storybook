@@ -95,7 +95,7 @@ let private hausBauenQ =
             Next = End } }
 
 // € 1b
-let private getreideThomasQ =
+let private getreideTonyQ =
     { Type = Money
       Text =
         "Du hast nun nicht mehr viel eigenes Geld und
@@ -127,7 +127,7 @@ let private getreideThomasQ =
             Next = NextQuestion hausBauenQ } }
 
 // € 1a
-let private getreideTonyQ =
+let private getreideThomasQ =
     { Type = Money
       Text =
         "Greifst du Tonys Idee zu einem ziemlich riskanten Getreidegeschäft
@@ -231,7 +231,7 @@ let private permanderHeiratenQ =
 let private gerdaAnnaQ =
     { Type = Love
       Text =
-        "Heiratest du die reiche und geigespielende Gerda oder das arme
+        "Heiratest du die reiche und Geige spielende Gerda oder das arme
         Blumenmädchen Anna, die du manchmal heimlich besuchst…?"
       LeftAnswer =
           { Title = "Gerda"

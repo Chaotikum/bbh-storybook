@@ -6,5 +6,10 @@ students from the [GGS St. Jürgen][ggs] school and the [Buddenbrookhaus][bbh] m
 Germany, for a future exhibition.
 
 
-[ggs]: http://www.ggs-stjuergen.de/home.html
-[bbh]: http://buddenbrookhaus.de
+## Build + Run
+
+    ./fake.sh build -t watch
+
+
+[ggs]: https://www.ggs-stjuergen.de/home.html
+[bbh]: https://buddenbrookhaus.de

@@ -1,4 +1,5 @@
-module Animation
+// https://react-simple-animate.now.sh
+module Fable.ReactSimpleAnimate
 
 open System
 open Fable.Core
@@ -17,29 +18,27 @@ module Animate =
         | Duration of TimeSpan
         | Delay of TimeSpan
         | OnComplete of (unit -> unit)
-        // todo: type
-        | EaseType of string
-        // TODO
-        //| Render of
-        //| SequenceIndex
-        //| SequenceId
-        //| Overlay
+        | EaseType of string // todo: type
+        | Render of (unit -> ReactElement)
+        | SequenceIndex of int
+        | SequenceId of string
+        | Overlay of TimeSpan
+        | Key of string
 
     type private InternalProp =
         | Play of bool
         | End of obj
         | Start of obj
         | Complete of obj
-        | Duration of double
-        | Delay of double
+        | Duration of float
+        | Delay of float
         | OnComplete of (unit -> unit)
-        // todo: type
-        | EaseType of string
-        // TODO
-        //| Render of
-        //| SequenceIndex
-        //| SequenceId
-        //| Overlay
+        | EaseType of string // todo: type
+        | Render of (unit -> ReactElement)
+        | SequenceIndex of int
+        | SequenceId of string
+        | Overlay of float
+        | Key of string
 
     let private toInternalProp =
         function
@@ -51,7 +50,15 @@ module Animate =
         | Prop.Delay v          -> Delay v.TotalSeconds
         | Prop.OnComplete v     -> OnComplete v
         | Prop.EaseType v       -> EaseType v
+        | Prop.Render v         -> Render v
+        | Prop.SequenceIndex v  -> SequenceIndex v
+        | Prop.SequenceId v     -> SequenceId v
+        | Prop.Overlay v        -> Overlay v.TotalSeconds
+        | Prop.Key v            -> Key v
 
     let animate props children =
-        let internalProps = props |> List.map toInternalProp
-        ofImport<InternalProp list> "Animate" "react-simple-animate" internalProps children
+        let internalProps =
+            props
+            |> List.map toInternalProp
+            |> keyValueList CaseRules.LowerFirst
+        ofImport "Animate" "react-simple-animate" internalProps children
